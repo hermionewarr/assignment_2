@@ -10,6 +10,7 @@
 #include<fstream>
 #include<cmath>
 #include<string>
+#include<sstream>
 
 // Functions to compute mean and standard deviation
 // Mean
@@ -59,23 +60,26 @@ int main()
 		std::cin >> file_name;
 		return(0);
 	}
+
 	//finding the number of data points
 	std::string line{};
+	int i{};
 	while (std::getline(my_file, line)) {
-		//doesnt work omg
-		std::stringstream streak{};
-		if (my_file.fail() && !my_file.eof()) {
-			std::cerr << "found not a number" << std::endl;
-			my_file.clear(); // take stream out of fail state
-			my_file.ignore(100, '\n'); // ignore unwanted characters
-			number_data_points-=1;
+		std::stringstream line_input(line);
+		while (line_input >> line) {
+			i++;
+			if (line_input.fail() && !my_file.eof()) {
+				std::cerr << "Found not a number" << std::endl;
+				line_input.clear(); // take stream out of fail state
+				line_input.ignore(100, '\n'); // ignore unwanted characters
+				std::cout << "Error on line: " << i << std::endl;
+			}
+			else if (line_input.good()) {
+				number_data_points++;
+			}
 		}
-		//works a bit but messes up everything
-		//while (my_file >> ) {
-		//	number_data_points++;
-		//}
-		number_data_points++;
 	}
+
 	std::cout << "Number of data points: " << number_data_points << std::endl;
 
 	//return to beginning of file
@@ -89,20 +93,27 @@ int main()
 
 	// Read data from file, ignoring any additional bad data	
 	for (int i{}; i < number_data_points; i++) {
-		if (my_file.fail() && !my_file.eof()) {
+		if (my_file.good()) {
+			my_file >> milikan_data[i];
+			std::cout << milikan_data[i] << std::endl;
+		}
+		else if (my_file.fail() && !my_file.eof()) {
 			std::cerr << "Found a not number" << std::endl;
 			my_file.clear(); // take stream out of fail state
 			my_file.ignore(100, '\n'); // ignore unwanted line
 			break;
 		}
-		//while (std::getline(my_file, line)) {
-		//	while (my_file >> line) {
-		//		my_file >> milikan_data[i];
-		//		std::cout << milikan_data[i] << std::endl;
-		//	}
+		//std::stringstream line_input(line);
+		//if (line_input.good()) {
+		//	line_input >> milikan_data[i];
+		//	std::cout << milikan_data[i] << std::endl;
 		//}
-		my_file >> milikan_data[i];
-		std::cout << milikan_data[i] << std::endl;
+		//else if (line_input.fail() && !my_file.eof()) {
+		//	std::cerr << "Found not a number" << std::endl;
+		//	line_input.clear(); // take stream out of fail state
+		//	line_input.ignore(100, '\n'); // ignore unwanted characters
+		//	break;
+		//}  
 	}
 
 	// Compute mean

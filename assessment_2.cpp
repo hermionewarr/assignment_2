@@ -51,34 +51,33 @@ int main()
 
 	// Open file and check if successful
 	std::fstream my_file{ file_name };
-	while (!my_file.good()) {
+	if (!my_file.good()) {
 		// Print error message and exit
 		std::cerr << "Error: file could not be opened" << std::endl;
-		std::cout << "Please enter a valid file name: " << std::endl;
 		std::cin.clear();
 		std::cin.ignore(100, '\n');
-		std::cin >> file_name;
+		exit(1);
 		return(0);
 	}
+	std::cout << "File Successfully opened!" << std::endl;
 
 	//finding the number of data points
 	std::string line{};
-	int i{};
+	int no_of_lines{};
 	
 	while (std::getline(my_file, line)) {
 		std::stringstream line_input(line);
 		double is_line_a_double;
-		while (line_input >> is_line_a_double) {
-			i++;
-			if (line_input.fail() && !my_file.eof()) {
-				std::cerr << "Found not a number" << std::endl;
-				line_input.clear(); // take stream out of fail state
-				line_input.ignore(100, '\n'); // ignore unwanted characters
-				std::cout << "Error on line: " << i << std::endl;
-			}
-			else if (line_input.good()) {
-				number_data_points++;
-			}
+		line_input >> is_line_a_double;
+		no_of_lines++;
+		if (line_input.fail()) {
+			std::cerr << "Found not a number" << std::endl;
+			std::cout << "Error on line: " << no_of_lines << std::endl;
+			line_input.clear(); // take stream out of fail state
+			line_input.ignore(100, '\n'); // ignore unwanted characters
+		}
+		else if (line_input.good()) {
+			number_data_points++;
 		}
 	}
 
@@ -87,24 +86,10 @@ int main()
 	//return to beginning of file
 	my_file.clear();
 	my_file.seekg(0, std::ios::beg);
-
-	std::cout << "File Successfully opened!" << std::endl;
-
+	
 	// Allocate memory for data 
 	double* milikan_data{ new double[number_data_points] };
 
-	// Read data from file, ignoring any additional bad data	
-	//for (int i{}; i < number_data_points; i++) {
-		//if (my_file.good()) {
-		//	my_file >> milikan_data[i];
-		//	std::cout << milikan_data[i] << std::endl;
-		//}
-		//else if (my_file.fail() && !my_file.eof()) {
-		//	std::cerr << "Found a not number" << std::endl;
-		//	my_file.clear(); // take stream out of fail state
-		//	my_file.ignore(100, '\n'); // ignore unwanted line
-		//	break;
-		//}
 	int data_number{};
 	while (std::getline(my_file, line)) {
 		std::stringstream line_input(line);
@@ -116,13 +101,11 @@ int main()
 			data_number++;
 		}
 		else {
-			std::cerr << "Found not a number" << std::endl;
 			line_input.clear(); // take stream out of fail state
 			line_input.ignore(100, '\n'); // ignore unwanted characters
 		}
 	}
 	
-
 	// Compute mean
 	double mean = calculate_mean(number_data_points, milikan_data);
 	std::cout << "The mean of your data is: " << mean << "eV" << std::endl;
@@ -136,6 +119,7 @@ int main()
 	// Free memory
 	delete[] milikan_data;
 	std::cout << "Freed memory" << std::endl;
+
 	// Close file
 	my_file.close();
 	

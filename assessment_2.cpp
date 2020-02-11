@@ -64,9 +64,11 @@ int main()
 	//finding the number of data points
 	std::string line{};
 	int i{};
+	
 	while (std::getline(my_file, line)) {
 		std::stringstream line_input(line);
-		while (line_input >> line) {
+		double is_line_a_double;
+		while (line_input >> is_line_a_double) {
 			i++;
 			if (line_input.fail() && !my_file.eof()) {
 				std::cerr << "Found not a number" << std::endl;
@@ -92,29 +94,34 @@ int main()
 	double* milikan_data{ new double[number_data_points] };
 
 	// Read data from file, ignoring any additional bad data	
-	for (int i{}; i < number_data_points; i++) {
-		if (my_file.good()) {
-			my_file >> milikan_data[i];
-			std::cout << milikan_data[i] << std::endl;
-		}
-		else if (my_file.fail() && !my_file.eof()) {
-			std::cerr << "Found a not number" << std::endl;
-			my_file.clear(); // take stream out of fail state
-			my_file.ignore(100, '\n'); // ignore unwanted line
-			break;
-		}
-		//std::stringstream line_input(line);
-		//if (line_input.good()) {
-		//	line_input >> milikan_data[i];
+	//for (int i{}; i < number_data_points; i++) {
+		//if (my_file.good()) {
+		//	my_file >> milikan_data[i];
 		//	std::cout << milikan_data[i] << std::endl;
 		//}
-		//else if (line_input.fail() && !my_file.eof()) {
-		//	std::cerr << "Found not a number" << std::endl;
-		//	line_input.clear(); // take stream out of fail state
-		//	line_input.ignore(100, '\n'); // ignore unwanted characters
+		//else if (my_file.fail() && !my_file.eof()) {
+		//	std::cerr << "Found a not number" << std::endl;
+		//	my_file.clear(); // take stream out of fail state
+		//	my_file.ignore(100, '\n'); // ignore unwanted line
 		//	break;
-		//}  
+		//}
+	int data_number{};
+	while (std::getline(my_file, line)) {
+		std::stringstream line_input(line);
+		double is_line_a_double;
+		line_input >> is_line_a_double;
+		if (line_input.good()) {
+			milikan_data[data_number] = is_line_a_double;
+			std::cout << milikan_data[data_number] << std::endl;
+			data_number++;
+		}
+		else {
+			std::cerr << "Found not a number" << std::endl;
+			line_input.clear(); // take stream out of fail state
+			line_input.ignore(100, '\n'); // ignore unwanted characters
+		}
 	}
+	
 
 	// Compute mean
 	double mean = calculate_mean(number_data_points, milikan_data);

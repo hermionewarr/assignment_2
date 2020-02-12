@@ -1,6 +1,6 @@
 // PHYS 30762 Programming in C++ Assignment 2 
 // Hermione Warr
-// Start: 04/02/2020 Completed:
+// Start: 04/02/2020 Completed: 12/02/2020
 
 // Program to compute mean, standard deviation and standard
 // error of the mean electronic charge. Data is read from file
@@ -12,7 +12,7 @@
 #include<string>
 #include<sstream>
 
-// Functions to compute mean and standard deviation
+// Functions to compute mean and standard deviation and error on the mean
 // Mean
 double calculate_mean(int num_elements_in_array, double * data_from_file) {
 	double sum{};
@@ -44,6 +44,7 @@ int main()
 	int number_data_points{};
 	std::string y_n{};
 	std::string file_name{};
+	std::string line{};
 	
 	// Ask user to enter filename
 	std::cout << "Please enter the filename: " << std::endl;
@@ -62,9 +63,7 @@ int main()
 	std::cout << "File Successfully opened!" << std::endl;
 
 	//finding the number of data points
-	std::string line{};
 	int no_of_lines{};
-	
 	while (std::getline(my_file, line)) {
 		std::stringstream line_input(line);
 		double is_line_a_double;
@@ -90,7 +89,9 @@ int main()
 	// Allocate memory for data 
 	double* milikan_data{ new double[number_data_points] };
 
+	//allocate data to an arrays
 	int data_number{};
+	std::cout << "Data: " << std::endl;
 	while (std::getline(my_file, line)) {
 		std::stringstream line_input(line);
 		double is_line_a_double;
@@ -105,7 +106,10 @@ int main()
 			line_input.ignore(100, '\n'); // ignore unwanted characters
 		}
 	}
-	
+
+	// Close file
+	my_file.close();
+
 	// Compute mean
 	double mean = calculate_mean(number_data_points, milikan_data);
 	std::cout << "The mean of your data is: " << mean << "eV" << std::endl;
@@ -116,12 +120,15 @@ int main()
 	double std_error_on_mean = calculate_standard_er_on_mean(standard_deviation, number_data_points);
 	std::cout << "The standard error on your mean is: +/- " << std_error_on_mean << std::endl;
 	
+	//set precesion
+	std::cout << "To three decimal places: " << std::endl;
+	std::cout.setf(std::ios::fixed, std::ios::floatfield);
+	std::cout << "mean = " << std::setprecision(3) << mean << "+/-" << std_error_on_mean << " eV" << std::endl;
+	std::cout << "The standard deviation of your data is: " << std::setprecision(3) << standard_deviation << "eV" << std::endl;
+	
 	// Free memory
 	delete[] milikan_data;
 	std::cout << "Freed memory" << std::endl;
-
-	// Close file
-	my_file.close();
-	
+		
 	return 0;
 }

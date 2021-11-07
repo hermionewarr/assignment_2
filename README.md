@@ -1,1 +1,2 @@
-# C-course
+# C++ course
+Assignment 2
